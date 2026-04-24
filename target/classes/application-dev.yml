@@ -1,0 +1,83 @@
+server:
+  port: 8081
+  servlet:
+    context-path: /api/v1
+
+spring:
+  application:
+    name: smart-wardrobe-server
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/smart_wardrobe?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: 12345678
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  redis:
+    host: localhost
+    port: 6379
+    password: 12345678
+    database: 0
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 100MB
+
+mybatis-plus:
+  mapper-locations: classpath*:mapper/**/*.xml
+  type-aliases-package: com.smartwardrobe.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# JWT配置
+jwt:
+  secret: smartWardrobeSecretKey2024ForJwtTokenGenerationTest
+  expiration: 7200000
+
+# 微信配置（测试环境使用mock）
+wechat:
+  appid: mock_appid
+  secret: mock_secret
+
+# 和风天气配置
+qweather:
+  key: 
+  base-url: https://devapi.qweather.com/v7
+
+# 百度OCR配置
+baidu:
+  ocr:
+    app-id: 
+    api-key: 
+    secret-key: 
+
+# Remove.bg配置
+removebg:
+  api-key: 
+  base-url: https://api.remove.bg/v1.0
+
+# 阿里云OSS配置
+aliyun:
+  oss:
+    endpoint: 
+    access-key-id: 
+    access-key-secret: 
+    bucket-name: 
+    domain: 
+
+logging:
+  level:
+    com.smartwardrobe: DEBUG
+    org.springframework.web: INFO
+
+app:
+  image:
+    max-size: 10485760
+    allowed-types: image/jpeg,image/png,image/webp
+  recommend:
+    default-count: 3
+    max-count: 5
+  sleeping:
+    threshold-days: 90

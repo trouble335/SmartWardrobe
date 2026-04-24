@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.smartwardrobe.mapper.ItemMapper">
+
+    <resultMap id="ItemResultMap" type="com.smartwardrobe.entity.Item">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="name" property="name"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="sub_category_id" property="subCategoryId"/>
+        <result column="colors" property="colors"/>
+        <result column="size" property="size"/>
+        <result column="material" property="material"/>
+        <result column="seasons" property="seasons"/>
+        <result column="styles" property="styles"/>
+        <result column="occasions" property="occasions"/>
+        <result column="image_url" property="imageUrl"/>
+        <result column="original_image_url" property="originalImageUrl"/>
+        <result column="status" property="status"/>
+        <result column="wear_count" property="wearCount"/>
+        <result column="last_worn" property="lastWorn"/>
+        <result column="location_id" property="locationId"/>
+        <result column="price" property="price"/>
+        <result column="platform" property="platform"/>
+        <result column="purchase_date" property="purchaseDate"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+        <result column="deleted" property="deleted"/>
+        <result column="category_name" property="categoryName"/>
+        <result column="sub_category_name" property="subCategoryName"/>
+        <result column="location_name" property="locationName"/>
+    </resultMap>
+
+    <select id="findListWithFilters" resultMap="ItemResultMap">
+        SELECT i.*, c1.name as category_name, c2.name as sub_category_name, l.name as location_name
+        FROM item i
+        LEFT JOIN category c1 ON i.category_id = c1.id
+        LEFT JOIN category c2 ON i.sub_category_id = c2.id
+        LEFT JOIN location l ON i.location_id = l.id
+        WHERE i.user_id = #{userId} AND i.deleted = 0
+        <if test="categoryId != null">
+            AND i.category_id = #{categoryId}
+        </if>
+        <if test="styles != null and styles.size() > 0">
+            AND (
+            <foreach collection="styles" item="style" separator="OR">
+                JSON_CONTAINS(i.styles, JSON_QUOTE(#{style}))
+            </foreach>
+            )
+        </if>
+        <if test="seasons != null and seasons.size() > 0">
+            AND (
+            <foreach collection="seasons" item="season" separator="OR">
+                JSON_CONTAINS(i.seasons, JSON_QUOTE(#{season}))
+            </foreach>
+            )
+        </if>
+        <if test="occasions != null and occasions.size() > 0">
+            AND (
+            <foreach collection="occasions" item="occasion" separator="OR">
+                JSON_CONTAINS(i.occasions, JSON_QUOTE(#{occasion}))
+            </foreach>
+            )
+        </if>
+        <if test="colors != null and colors.size() > 0">
+            AND (
+            <foreach collection="colors" item="color" separator="OR">
+                JSON_CONTAINS(i.colors, JSON_QUOTE(#{color}))
+            </foreach>
+            )
+        </if>
+        <if test="status != null">
+            AND i.status = #{status}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND (i.name LIKE CONCAT('%', #{keyword}, '%') OR i.material LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+        <choose>
+            <when test="sortBy == 'wearCount'">
+                ORDER BY i.wear_count ${sortOrder == 'asc' ? 'ASC' : 'DESC'}
+            </when>
+            <when test="sortBy == 'lastWorn'">
+                ORDER BY i.last_worn ${sortOrder == 'asc' ? 'ASC' : 'DESC'}
+            </when>
+            <when test="sortBy == 'createdAt'">
+                ORDER BY i.created_at ${sortOrder == 'asc' ? 'ASC' : 'DESC'}
+            </when>
+            <otherwise>
+                ORDER BY i.created_at DESC
+            </otherwise>
+        </choose>
+    </select>
+
+</mapper>
